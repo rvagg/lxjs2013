@@ -127,10 +127,11 @@ body, section.bespoke-slide {
 
 .highlight pre, pre {
   border-color: #c0c0c0;
-  overflow-x: auto;
+  overflow-x: hidden;
   white-space: pre;
   padding: 10px;
   line-height: 150%;
+  margin: 10px;
 }
 
 pre code, pre tt {

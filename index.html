@@ -107,20 +107,206 @@
       
         <section>
           <h2>LevelUP: Database primitives</h2>
-<p>... get, put, del, batch, readstream</p>
+<p><br></p>
+<ul>
+<li>Open / Close</li>
+<li>Get</li>
+<li>Put</li>
+<li>Del</li>
+<li>Batch</li>
+<li>ReadStream</li>
+</ul>
+
+        </section>
+      
+        <section>
+          <h2>Primitives: ReadStream</h2>
+<p>The simplest form of a query mechanism</p>
+<p>Basic range query:</p>
+<div class="highlight"><pre>| a | b | e | f1 | f2 | g | h | i | o | p | q | r | v |
+          ↑    <span class="s1">&#39;e&#39;</span> → <span class="s1">&#39;h&#39;</span>    ↑
+          ╰─────────────────╯
+</pre></div>
+
+
+        </section>
+      
+        <section>
+          <h2>Primitives: ReadStream</h2>
+<p>The simplest form of a query mechanism</p>
+<p>Basic range query:</p>
+<div class="highlight"><pre>| a | b | e | f1 | f2 | g | h | i | o | p | q | r | v |
+          ↑    <span class="s1">&#39;e&#39;</span> → <span class="s1">&#39;h&#39;</span>    ↑
+          ╰─────────────────╯
+</pre></div>
+
+<div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">createReadStream</span><span class="p">({</span> <span class="nx">start</span><span class="o">:</span> <span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="nx">end</span><span class="o">:</span> <span class="s1">&#39;h&#39;</span> <span class="p">})</span>
+
+<span class="c1">// &#39;e&#39;, &#39;f1&#39;, &#39;f2&#39;, &#39;g&#39;, &#39;h&#39;</span>
+</pre></div>
+
+
+        </section>
+      
+        <section>
+          <h2>Primitives: ReadStream</h2>
+<p>Stab in the dark:</p>
+<div class="highlight"><pre>| a | b | e | f1 | f2 | g | h | i | o | p | q | r | v |
+              ↑     ↑
+              ╰─────╯
+</pre></div>
+
+
+        </section>
+      
+        <section>
+          <h2>Primitives: ReadStream</h2>
+<p>Stab in the dark:</p>
+<div class="highlight"><pre>| a | b | e | f1 | f2 | g | h | i | o | p | q | r | v |
+              ↑     ↑
+              ╰─────╯
+</pre></div>
+
+<p>Bytewise comparison to the rescue!</p>
+<div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">createReadStream</span><span class="p">({</span> <span class="nx">start</span><span class="o">:</span> <span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="nx">end</span><span class="o">:</span> <span class="s1">&#39;f~&#39;</span> <span class="p">})</span>
+
+<span class="c1">// &#39;f1&#39;, &#39;f2&#39;</span>
+</pre></div>
+
+
+        </section>
+      
+        <section>
+          <h2>Primitives: Batch</h2>
+<p>Atomic operations for sophisticated behaviour</p>
+<p>Example: Indexes</p>
+<div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;bar&#39;</span> <span class="p">})</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="s1">&#39;boom&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;bang&#39;</span> <span class="p">})</span>
+
+<span class="c1">// ?? db.getBy(&#39;name&#39;, &#39;bar&#39;)</span>
+</pre></div>
+
+
+        </section>
+      
+        <section>
+          <h2>Primitives: Batch</h2>
+<div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;bar&#39;</span> <span class="p">})</span>         <span class="c1">// primary entry</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="s1">&#39;index~name~bar~foo&#39;</span><span class="p">,</span> <span class="s1">&#39;foo&#39;</span><span class="p">)</span>      <span class="c1">// index entry</span>
+
+<span class="nx">getBy</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">keys</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">return</span> <span class="nx">db</span><span class="p">.</span><span class="nx">createReadStream</span><span class="p">({</span>
+      <span class="nx">start</span> <span class="o">:</span> <span class="s1">&#39;index~&#39;</span> <span class="o">+</span> <span class="nx">index</span> <span class="o">+</span> <span class="s1">&#39;~&#39;</span> <span class="o">+</span> <span class="nx">value</span> <span class="o">+</span> <span class="s1">&#39;~&#39;</span>
+    <span class="p">,</span> <span class="nx">end</span>   <span class="o">:</span> <span class="s1">&#39;index~&#39;</span> <span class="o">+</span> <span class="nx">index</span> <span class="o">+</span> <span class="s1">&#39;~&#39;</span> <span class="o">+</span> <span class="nx">value</span> <span class="o">+</span> <span class="s1">&#39;~~&#39;</span>
+  <span class="p">}).</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">entry</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">keys</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">entry</span><span class="p">.</span><span class="nx">value</span><span class="p">)</span>
+  <span class="p">}).</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;end&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">keys</span><span class="p">)</span>
+  <span class="p">})</span>
+<span class="p">}</span>
+</pre></div>
+
+
+        </section>
+      
+        <section>
+          <h2>Primitives: Batch</h2>
+<div class="highlight"><pre><span class="nx">put</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">db</span><span class="p">.</span><span class="nx">batch</span><span class="p">().</span><span class="nx">put</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span>            <span class="c1">// primary entry</span>
+    <span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="s1">&#39;index~name~&#39;</span> <span class="o">+</span> <span class="nx">value</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="s1">&#39;~&#39;</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="c1">// index</span>
+    <span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="nx">callback</span><span class="p">)</span>                          <span class="c1">// atomic!</span>
+<span class="p">}</span>
+
+<span class="nx">put</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;bar&#39;</span> <span class="p">},</span> <span class="p">...)</span>
+
+<span class="c1">//  db.createReadStream({</span>
+<span class="c1">//      start : &#39;index~&#39; + index + &#39;~&#39; + value + &#39;~&#39;</span>
+<span class="c1">//    , end   : &#39;index~&#39; + index + &#39;~&#39; + value + &#39;~~&#39;</span>
+<span class="c1">//  })</span>
+</pre></div>
+
+<p>Automated with <strong>level-hooks</strong></p>
+
+        </section>
+      
+        <section>
+          <h2>Primitives: Batch</h2>
+<p style="margin: 0;">Example: Async work that <em>must</em> be performed for each entry</p>
+
+<div class="highlight"><pre><span class="nx">put</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">db</span><span class="p">.</span><span class="nx">batch</span><span class="p">().</span><span class="nx">put</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span>            <span class="c1">// primary entry</span>
+    <span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="s1">&#39;pending~&#39;</span> <span class="o">+</span> <span class="nx">key</span> <span class="o">+</span> <span class="s1">&#39;~&#39;</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span>          <span class="c1">// marker</span>
+    <span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="nx">callback</span><span class="p">)</span>                          <span class="c1">// atomic!</span>
+  <span class="nx">work</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="nx">work</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// do some async work...</span>
+  <span class="nx">db</span><span class="p">.</span><span class="nx">del</span><span class="p">(</span><span class="s1">&#39;pending~&#39;</span> <span class="o">+</span> <span class="nx">key</span> <span class="o">+</span> <span class="s1">&#39;~&#39;</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="c1">// on restart:</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">createReadStream</span><span class="p">({</span> <span class="nx">start</span><span class="o">:</span> <span class="s1">&#39;pending~&#39;</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nx">work</span><span class="p">)</span>
+</pre></div>
+
+
+        </section>
+      
+        <section>
+          <h2>Primitives: Buckets</h2>
+<p>Like <em>tables</em>, for organising data and separating types of data</p>
+<div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="s1">&#39;~countries~Morocco&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">capital</span><span class="o">:</span> <span class="s1">&#39;Rabat&#39;</span> <span class="p">})</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="s1">&#39;~countries~Portugal&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">capital</span><span class="o">:</span> <span class="s1">&#39;Lisbon&#39;</span> <span class="p">})</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="s1">&#39;~countries~Spain&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">capital</span><span class="o">:</span> <span class="s1">&#39;Madrid&#39;</span> <span class="p">})</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="s1">&#39;~cities~Leiria&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">population</span><span class="o">:</span> <span class="mi">50264</span> <span class="p">})</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="s1">&#39;~cities~Lisbon&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">population</span><span class="o">:</span> <span class="mi">547631</span> <span class="p">})</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="s1">&#39;~cities~Lixa&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">population</span><span class="o">:</span> <span class="mi">5500</span> <span class="p">})</span>
+</pre></div>
+
+
+        </section>
+      
+        <section>
+          <h2>Primitives: Buckets</h2>
+<p>Automated with <strong>level-sublevel</strong></p>
+<div class="highlight"><pre><span class="nx">db</span> <span class="o">=</span> <span class="nx">sublevel</span><span class="p">(</span><span class="nx">db</span><span class="p">)</span>
+<span class="nx">countriesDb</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">sublevel</span><span class="p">(</span><span class="s1">&#39;countries&#39;</span><span class="p">)</span>
+<span class="nx">citiesDb</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">sublevel</span><span class="p">(</span><span class="s1">&#39;cities&#39;</span><span class="p">)</span>
+
+<span class="nx">countriesDb</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="s1">&#39;Morocco&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">capital</span><span class="o">:</span> <span class="s1">&#39;Rabat&#39;</span> <span class="p">})</span>
+<span class="nx">countriesDb</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="s1">&#39;Portugal&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">capital</span><span class="o">:</span> <span class="s1">&#39;Lisbon&#39;</span> <span class="p">})</span>
+<span class="nx">countriesDb</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="s1">&#39;Spain&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">capital</span><span class="o">:</span> <span class="s1">&#39;Madrid&#39;</span> <span class="p">})</span>
+<span class="nx">citiesDb</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="s1">&#39;Leiria&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">population</span><span class="o">:</span> <span class="mi">50264</span> <span class="p">})</span>
+<span class="nx">citiesDb</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="s1">&#39;Lisbon&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">population</span><span class="o">:</span> <span class="mi">547631</span> <span class="p">})</span>
+<span class="nx">citiesDb</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="s1">&#39;Lixa&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">population</span><span class="o">:</span> <span class="mi">5500</span> <span class="p">})</span>
+
+<span class="nx">countriesDb</span><span class="p">.</span><span class="nx">createReadStream</span><span class="p">().</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">)</span>
+</pre></div>
+
 
         </section>
       
         <section>
           <h2>LevelDOWN: Storage flexibility</h2>
-<p>... leveldb forks, lmdb, level.js</p>
+<div data-bespoke-bullet>
+  <ul>
+    <li>LevelDB (Google)</li>
+    <li>LevelDB (Basho)</li>
+    <li>HyperLevelDB (HyperDex)</li>
+    <li>LMDB</li>
+    <li>MemDOWN</li>
+    <li>mysqlDOWN</li>
+    <li><i>more under development...</i></li>
+  </ul>
+</div>
+<div data-bespoke-bullet>
 
-        </section>
-      
-        <section>
-          <h2>LevelUP: Building blocks</h2>
-<p>why batch?</p>
-<p>readstream for queries</p>
+<p>...and <strong>level.js</strong></p>
+
+<p>The Level* ecosystem in the browser!</p>
+
+</div>
+
 
         </section>
       
@@ -224,7 +410,9 @@
       </article>
 
       <footer>
+      <!--
         <img src="img/nodelogo.png">
+      -->
       </footer>
 
     </div>

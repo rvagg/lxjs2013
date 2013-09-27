@@ -80,22 +80,218 @@ Optional extras...
 
 ## LevelUP: Database primitives
 
-... get, put, del, batch, readstream
+<br>
+
+* Open / Close
+* Get
+* Put
+* Del
+* Batch
+* ReadStream
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## Primitives: ReadStream
+
+The simplest form of a query mechanism
+
+Basic range query:
+
+```sh
+| a | b | e | f1 | f2 | g | h | i | o | p | q | r | v |
+          ↑    'e' → 'h'    ↑
+          ╰─────────────────╯
+```
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## Primitives: ReadStream
+
+The simplest form of a query mechanism
+
+Basic range query:
+
+```sh
+| a | b | e | f1 | f2 | g | h | i | o | p | q | r | v |
+          ↑    'e' → 'h'    ↑
+          ╰─────────────────╯
+```
+
+```js
+db.createReadStream({ start: 'e', end: 'h' })
+
+// 'e', 'f1', 'f2', 'g', 'h'
+```
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## Primitives: ReadStream
+
+Stab in the dark:
+
+```sh
+| a | b | e | f1 | f2 | g | h | i | o | p | q | r | v |
+              ↑     ↑
+              ╰─────╯
+```
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## Primitives: ReadStream
+
+Stab in the dark:
+
+```sh
+| a | b | e | f1 | f2 | g | h | i | o | p | q | r | v |
+              ↑     ↑
+              ╰─────╯
+```
+
+Bytewise comparison to the rescue!
+
+```js
+db.createReadStream({ start: 'f', end: 'f~' })
+
+// 'f1', 'f2'
+```
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## Primitives: Batch
+
+Atomic operations for sophisticated behaviour
+
+Example: Indexes
+
+```js
+db.put('foo', { name: 'bar' })
+db.put('boom', { name: 'bang' })
+
+// ?? db.getBy('name', 'bar')
+```
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## Primitives: Batch
+
+```js
+db.put('foo', { name: 'bar' })         // primary entry
+db.put('index~name~bar~foo', 'foo')      // index entry
+
+getBy = function (index, value, callback) {
+  var keys = []
+  return db.createReadStream({
+      start : 'index~' + index + '~' + value + '~'
+    , end   : 'index~' + index + '~' + value + '~~'
+  }).on('data', function (entry) {
+    keys.push(entry.value)
+  }).on('end', function () {
+    callback(null, keys)
+  })
+}
+```
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## Primitives: Batch
+
+```js
+put = function (key, value, callback) {
+  db.batch().put(key, value)            // primary entry
+    .put('index~name~' + value.name + '~', key) // index
+    .write(callback)                          // atomic!
+}
+
+put('foo', { name: 'bar' }, ...)
+
+//  db.createReadStream({
+//      start : 'index~' + index + '~' + value + '~'
+//    , end   : 'index~' + index + '~' + value + '~~'
+//  })
+```
+
+Automated with **level-hooks**
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## Primitives: Batch
+
+<p style="margin: 0;">Example: Async work that *must* be performed for each entry</p>
+
+```js
+put = function (key, value, callback) {
+  db.batch().put(key, value)            // primary entry
+    .put('pending~' + key + '~', key)          // marker
+    .write(callback)                          // atomic!
+  work(key, value)
+}
+work = function (key, value) {
+  // do some async work...
+  db.del('pending~' + key + '~')
+}
+// on restart:
+db.createReadStream({ start: 'pending~' })
+  .on('data', work)
+```
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## Primitives: Buckets
+
+Like *tables*, for organising data and separating types of data
+
+```js
+db.put('~countries~Morocco', { capital: 'Rabat' })
+db.put('~countries~Portugal', { capital: 'Lisbon' })
+db.put('~countries~Spain', { capital: 'Madrid' })
+db.put('~cities~Leiria', { population: 50264 })
+db.put('~cities~Lisbon', { population: 547631 })
+db.put('~cities~Lixa', { population: 5500 })
+```
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## Primitives: Buckets
+
+Automated with **level-sublevel**
+
+```js
+db = sublevel(db)
+countriesDb = db.sublevel('countries')
+citiesDb = db.sublevel('cities')
+
+countriesDb.put('Morocco', { capital: 'Rabat' })
+countriesDb.put('Portugal', { capital: 'Lisbon' })
+countriesDb.put('Spain', { capital: 'Madrid' })
+citiesDb.put('Leiria', { population: 50264 })
+citiesDb.put('Lisbon', { population: 547631 })
+citiesDb.put('Lixa', { population: 5500 })
+
+countriesDb.createReadStream().on('data', console.log)
+```
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## LevelDOWN: Storage flexibility
 
-... leveldb forks, lmdb, level.js
+<div data-bespoke-bullet>
+  <ul>
+    <li>LevelDB (Google)</li>
+    <li>LevelDB (Basho)</li>
+    <li>HyperLevelDB (HyperDex)</li>
+    <li>LMDB</li>
+    <li>MemDOWN</li>
+    <li>mysqlDOWN</li>
+    <li><i>more under development...</i></li>
+  </ul>
+</div>
+<div data-bespoke-bullet>
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+<p>...and **level.js**</p>
 
-## LevelUP: Building blocks
+<p>The Level* ecosystem in the browser!</p>
 
-why batch?
-
-readstream for queries
-
+</div>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 <table class="ecosystem">
