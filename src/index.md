@@ -1,5 +1,15 @@
 
-# Node Databases
+# JavaScript Databases II
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+<div style="margin-top: 0.5em; text-align: center">
+  <img src="img/ogden_lxjs2013.png" style="width: 450px; border: solid white 2px; border-radius: 5px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);">
+</div>
+
+<p style="text-align: center; font-size: 12px;">**Max Ogden** - *"JavaScript Databases"* - LXJS 2012</p>
+
+<p>"I want to see a time where I can write a persistence function that can run in Node, the browser and anywhere else JavaScript runs."</p>
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -36,6 +46,55 @@ Optional extras...
 <p class="nodedb item">Reimplementing database *practice* &amp; *theory*</p>
 
 </div>
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## Inspired by LevelDB
+
+* Open-source, embedded key/value store by Google
+* Entries sorted by keys
+* Basic operations: <code>Get(), Put(), Del()</code>
+* Atomic <code>Batch()</code>
+* Bi-directional iterators
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## LevelDB: basic architecture
+
+<div data-bespoke-bullet></div>
+
+<p data-bespoke-bullet>
+  <b>Log Structured Merge Tree (LSM)</b>
+  <img style="float: right; width: 50%; margin: 0 -1em 0 0.5em;" src="img/leveldb_simple.svg">
+</p>
+
+<ul>
+  <li data-bespoke-bullet>Writes go straight into a <b>log</b></li>
+  <li data-bespoke-bullet>Log is <b>flushed</b> <i>string sorted table</i> (SST) files</li>
+  <li data-bespoke-bullet>SST files grow into a hierarchy of overlapping "<b>levels</b>"</li>
+  <li data-bespoke-bullet>Reads <b>merge</b> the log and the level / SST data</li>
+  <li data-bespoke-bullet>Cache speeds up common reads</li>
+</ul>
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## LevelUP: Database primitives
+
+... get, put, del, batch, readstream
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## LevelDOWN: Storage flexibility
+
+... leveldb forks, lmdb, level.js
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## LevelUP: Building blocks
+
+why batch?
+
+readstream for queries
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -126,54 +185,5 @@ Optional extras...
     </td>
   </tr>
 </table>
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-## Inspired by LevelDB
-
-* Open-source, embedded key/value store by Google
-* Entries sorted by keys
-* Basic operations: <code>Get(), Put(), Del()</code>
-* Atomic <code>Batch()</code>
-* Bi-directional iterators
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-## LevelDB: basic architecture
-
-<div data-bespoke-bullet></div>
-
-<p data-bespoke-bullet>
-  <b>Log Structured Merge Tree (LSM)</b>
-  <img style="float: right; width: 50%; margin: 0 -1em 0 0.5em;" src="img/leveldb_simple.svg">
-</p>
-
-<ul>
-  <li data-bespoke-bullet>Writes go straight into a <b>log</b></li>
-  <li data-bespoke-bullet>Log is <b>flushed</b> <i>string sorted table</i> (SST) files</li>
-  <li data-bespoke-bullet>SST files grow into a hierarchy of overlapping "<b>levels</b>"</li>
-  <li data-bespoke-bullet>Reads <b>merge</b> the log and the level / SST data</li>
-  <li data-bespoke-bullet>Cache speeds up common reads</li>
-</ul>
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-## LevelUP: Database primitives
-
-... get, put, del, batch, readstream
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-## LevelDOWN: Storage flexibility
-
-... leveldb forks, lmdb, level.js
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-## LevelUP: Building blocks
-
-why batch?
-
-readstream for queries
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width" />
-    <title>Node Databases</title>
+    <title>JavaScript Databases II</title>
     <link rel="stylesheet" type="text/css" href="style/markbase.css">
     <link rel="stylesheet" type="text/css" href="style/markthemes.css">
     <link rel="stylesheet" type="text/css" href="style/highlight.css">
@@ -13,14 +13,26 @@
 
     <div id="main">
       <header>
-        Node Databases
+        JavaScript Databases II
       </header>
 
       <article>
 
       
         <section>
-          <h1>Node Databases</h1>
+          <h1>JavaScript Databases II</h1>
+
+        </section>
+      
+        <section>
+          <div style="margin-top: 0.5em; text-align: center">
+  <img src="img/ogden_lxjs2013.png" style="width: 450px; border: solid white 2px; border-radius: 5px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);">
+</div>
+
+<p style="text-align: center; font-size: 12px;"><strong>Max Ogden</strong> - <em>&quot;JavaScript Databases&quot;</em> - LXJS 2012</p>
+
+<p>&quot;I want to see a time where I can write a persistence function that can run in Node, the browser and anywhere else JavaScript runs.&quot;</p>
+
 
         </section>
       
@@ -58,6 +70,57 @@
 <p class="nodedb item">Reimplementing database <em>practice</em> &amp; <em>theory</em></p>
 
 <p></div></p>
+
+        </section>
+      
+        <section>
+          <h2>Inspired by LevelDB</h2>
+<ul>
+<li>Open-source, embedded key/value store by Google</li>
+<li>Entries sorted by keys</li>
+<li>Basic operations: <code>Get(), Put(), Del()</code></li>
+<li>Atomic <code>Batch()</code></li>
+<li>Bi-directional iterators</li>
+</ul>
+
+        </section>
+      
+        <section>
+          <h2>LevelDB: basic architecture</h2>
+<div data-bespoke-bullet></div>
+
+<p data-bespoke-bullet>
+  <b>Log Structured Merge Tree (LSM)</b>
+  <img style="float: right; width: 50%; margin: 0 -1em 0 0.5em;" src="img/leveldb_simple.svg">
+</p>
+
+<ul>
+  <li data-bespoke-bullet>Writes go straight into a <b>log</b></li>
+  <li data-bespoke-bullet>Log is <b>flushed</b> <i>string sorted table</i> (SST) files</li>
+  <li data-bespoke-bullet>SST files grow into a hierarchy of overlapping &quot;<b>levels</b>&quot;</li>
+  <li data-bespoke-bullet>Reads <b>merge</b> the log and the level / SST data</li>
+  <li data-bespoke-bullet>Cache speeds up common reads</li>
+</ul>
+
+
+        </section>
+      
+        <section>
+          <h2>LevelUP: Database primitives</h2>
+<p>... get, put, del, batch, readstream</p>
+
+        </section>
+      
+        <section>
+          <h2>LevelDOWN: Storage flexibility</h2>
+<p>... leveldb forks, lmdb, level.js</p>
+
+        </section>
+      
+        <section>
+          <h2>LevelUP: Building blocks</h2>
+<p>why batch?</p>
+<p>readstream for queries</p>
 
         </section>
       
@@ -150,57 +213,6 @@
   </tr>
 </table>
 
-
-        </section>
-      
-        <section>
-          <h2>Inspired by LevelDB</h2>
-<ul>
-<li>Open-source, embedded key/value store by Google</li>
-<li>Entries sorted by keys</li>
-<li>Basic operations: <code>Get(), Put(), Del()</code></li>
-<li>Atomic <code>Batch()</code></li>
-<li>Bi-directional iterators</li>
-</ul>
-
-        </section>
-      
-        <section>
-          <h2>LevelDB: basic architecture</h2>
-<div data-bespoke-bullet></div>
-
-<p data-bespoke-bullet>
-  <b>Log Structured Merge Tree (LSM)</b>
-  <img style="float: right; width: 50%; margin: 0 -1em 0 0.5em;" src="img/leveldb_simple.svg">
-</p>
-
-<ul>
-  <li data-bespoke-bullet>Writes go straight into a <b>log</b></li>
-  <li data-bespoke-bullet>Log is <b>flushed</b> <i>string sorted table</i> (SST) files</li>
-  <li data-bespoke-bullet>SST files grow into a hierarchy of overlapping &quot;<b>levels</b>&quot;</li>
-  <li data-bespoke-bullet>Reads <b>merge</b> the log and the level / SST data</li>
-  <li data-bespoke-bullet>Cache speeds up common reads</li>
-</ul>
-
-
-        </section>
-      
-        <section>
-          <h2>LevelUP: Database primitives</h2>
-<p>... get, put, del, batch, readstream</p>
-
-        </section>
-      
-        <section>
-          <h2>LevelDOWN: Storage flexibility</h2>
-<p>... leveldb forks, lmdb, level.js</p>
-
-        </section>
-      
-        <section>
-          <h2>LevelUP: Building blocks</h2>
-<p>why batch?</p>
-<p>readstream for queries</p>
 
         </section>
       
