@@ -31,7 +31,9 @@
 
 <p style="text-align: center; font-size: 12px;"><strong>Max Ogden</strong> - <em>&quot;JavaScript Databases&quot;</em> - LXJS 2012</p>
 
-<p>&quot;I want to see a time where I can write a persistence function that can run in Node, the browser and anywhere else JavaScript runs.&quot;</p>
+<div data-bespoke-bullet></div>
+
+<p data-bespoke-bullet style="text-align: center; font-style: italic;">&quot;I want to see a time where I can write a persistence function that can run in Node, the browser and anywhere else JavaScript runs.&quot;</p>
 
 
         </section>
@@ -196,7 +198,7 @@
 
 <span class="nx">getBy</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">keys</span> <span class="o">=</span> <span class="p">[]</span>
-  <span class="k">return</span> <span class="nx">db</span><span class="p">.</span><span class="nx">createReadStream</span><span class="p">({</span>
+  <span class="nx">db</span><span class="p">.</span><span class="nx">createReadStream</span><span class="p">({</span>
       <span class="nx">start</span> <span class="o">:</span> <span class="s1">&#39;index~&#39;</span> <span class="o">+</span> <span class="nx">index</span> <span class="o">+</span> <span class="s1">&#39;~&#39;</span> <span class="o">+</span> <span class="nx">value</span> <span class="o">+</span> <span class="s1">&#39;~&#39;</span>
     <span class="p">,</span> <span class="nx">end</span>   <span class="o">:</span> <span class="s1">&#39;index~&#39;</span> <span class="o">+</span> <span class="nx">index</span> <span class="o">+</span> <span class="s1">&#39;~&#39;</span> <span class="o">+</span> <span class="nx">value</span> <span class="o">+</span> <span class="s1">&#39;~~&#39;</span>
   <span class="p">}).</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">entry</span><span class="p">)</span> <span class="p">{</span>

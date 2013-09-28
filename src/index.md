@@ -9,7 +9,9 @@
 
 <p style="text-align: center; font-size: 12px;">**Max Ogden** - *"JavaScript Databases"* - LXJS 2012</p>
 
-<p>"I want to see a time where I can write a persistence function that can run in Node, the browser and anywhere else JavaScript runs."</p>
+<div data-bespoke-bullet></div>
+
+<p data-bespoke-bullet style="text-align: center; font-style: italic;">"I want to see a time where I can write a persistence function that can run in Node, the browser and anywhere else JavaScript runs."</p>
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -180,7 +182,7 @@ db.put('index~name~bar~foo', 'foo')      // index entry
 
 getBy = function (index, value, callback) {
   var keys = []
-  return db.createReadStream({
+  db.createReadStream({
       start : 'index~' + index + '~' + value + '~'
     , end   : 'index~' + index + '~' + value + '~~'
   }).on('data', function (entry) {
