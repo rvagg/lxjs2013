@@ -235,7 +235,7 @@ db.createReadStream({ start: 'pending~' })
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## Primitives: *Buckets*
+## *Buckets*
 
 Or *"namespaces"*
 
@@ -251,8 +251,7 @@ db.put('~cities~Lixa', { population: 5500 })
 ```
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-## Primitives: *Buckets*
+## *Buckets*
 
 Automated with **level-sublevel**
 
